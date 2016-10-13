@@ -8,7 +8,6 @@ from django.utils import six
 
 
 class UrlsTestMixin(object):
-    urls = 'djangojs.test_urls'
 
     def setUp(self):
         self.result = self.get_result()
@@ -16,8 +15,8 @@ class UrlsTestMixin(object):
 
     def test_simple_url(self):
         '''It should serialize a simple URL without parameters'''
-        self.assertIn('django_js_urls', self.result)
-        self.assertEqual(self.result['django_js_urls'], '/djangojs/urls')
+        self.assertIn('djangojs_urls', self.result)
+        self.assertEqual(self.result['djangojs_urls'], '/djangojs/urls.json')
 
     def test_url_an_arg(self):
         '''It should serialize an URL with a single anonymous parameter'''
@@ -55,13 +54,13 @@ class UrlsTestMixin(object):
     def test_unnamed_url_set(self):
         '''It should serialize unnamed url if JS_URLS_UNNAMED is set'''
         self.result = self.get_result()  # To take override_settings in account
-        self.assertIn('djangojs.test_urls.unnamed', self.result)
+        self.assertIn('tests.testproject.urls.unnamed', self.result)
 
     @override_settings(JS_URLS_UNNAMED=True)
     def test_unnamed_url_set_class(self):
         '''It should not serialize unnamed url for class based views if JS_URLS_UNNAMED is set'''
         self.result = self.get_result()  # To take override_settings in account
-        self.assertNotIn('djangojs.test_urls.TestFormView', self.result)
+        self.assertNotIn('djangojs.testproject.urls.TestFormView', self.result)
 
     def test_optionnal_chars(self):
         '''It should not serialize optionnal characters (take the shortest)'''
@@ -139,18 +138,18 @@ class UrlsTestMixin(object):
         self.assertEqual(self.result['ns3:fake'], reverse('ns3:fake'))
         self.assertNotIn('fake', self.result)
 
-    @override_settings(JS_URLS=['django_js_urls'])
+    @override_settings(JS_URLS=['djangojs_urls'])
     def test_urls_whitelist(self):
         '''Should only include urls listed in JS_URLS'''
         self.result = self.get_result()  # To take override_settings in account
-        self.assertIn('django_js_urls', self.result)
+        self.assertIn('djangojs_urls', self.result)
         self.assertNotIn('test_arg', self.result)
 
-    @override_settings(JS_URLS_EXCLUDE=['django_js_urls'])
+    @override_settings(JS_URLS_EXCLUDE=['djangojs_urls'])
     def test_urls_blacklist(self):
         '''Should exclude urls listed in JS_URLS_EXCLUDE'''
         self.result = self.get_result()  # To take override_settings in account
-        self.assertNotIn('django_js_urls', self.result)
+        self.assertNotIn('djangojs_urls', self.result)
         self.assertIn('test_arg', self.result)
 
     @override_settings(JS_URLS_NAMESPACES=['ns1'])
@@ -183,7 +182,7 @@ class UrlsTestMixin(object):
         finally:
             del _prefixes.value
 
-        self.assertEqual(self.result['django_js_urls'], '/force_script/djangojs/urls')
+        self.assertEqual(self.result['djangojs_urls'], '/force_script/djangojs/urls.json')
 
 
 class UrlsAsDictTest(UrlsTestMixin, TestCase):
@@ -193,17 +192,10 @@ class UrlsAsDictTest(UrlsTestMixin, TestCase):
         return urls_as_dict()
 
 
-class UrlsAsJsonTest(UrlsTestMixin, TestCase):
-
-    def get_result(self):
-        from djangojs.urls_serializer import urls_as_json
-        return json.loads(urls_as_json())
-
-
 class UrlsJsonViewTest(UrlsTestMixin, TestCase):
 
     def get_result(self):
-        self.response = self.client.get(reverse('django_js_urls'))
+        self.response = self.client.get(reverse('djangojs_urls'))
         return json.loads(self.response.content.decode())
 
     def test_render(self):
@@ -217,11 +209,11 @@ class UrlsJsonViewTest(UrlsTestMixin, TestCase):
     def test_force_script_name(self):
         from django.core.urlresolvers import set_script_prefix, _prefixes
         try:
-            url = reverse('django_js_urls')
+            url = reverse('djangojs_urls')
             set_script_prefix("/force_script")
             response = self.client.get(url)
         finally:
             del _prefixes.value
 
         result = json.loads(response.content.decode())
-        self.assertEqual(result['django_js_urls'], '/force_script/djangojs/urls')
+        self.assertEqual(result['djangojs_urls'], '/force_script/djangojs/urls.json')

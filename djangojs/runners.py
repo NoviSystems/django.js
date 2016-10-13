@@ -11,6 +11,7 @@ import sys
 from os.path import join, dirname
 from subprocess import Popen, STDOUT, PIPE
 from tempfile import NamedTemporaryFile, mkstemp
+from unittest import TestCase
 
 from django.contrib.staticfiles import finders
 from django.core.files.storage import FileSystemStorage
@@ -22,7 +23,6 @@ from django.utils.encoding import python_2_unicode_compatible
 from djangojs.tap import TapParser
 from djangojs.utils import StorageGlobber
 
-from django.utils.unittest import TestCase
 
 #: Console output line length for separators
 LINE_SIZE = 70
@@ -53,6 +53,7 @@ def parse_verbosity():
             verbosity = int(match.group(1)) if match.group(1) else int(sys.argv[idx + 1])
             break
     return verbosity
+
 
 VERBOSITY = parse_verbosity()
 VERBOSE = VERBOSITY > 1
