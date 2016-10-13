@@ -1,35 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import re
-import sys
 import codecs
 
 from setuptools import setup, find_packages
 
 
-PYPI_RST_FILTERS = (
-    # Replace code-blocks
-    (r'\.\.\s? code-block::\s*(\w|\+)+',  '::'),
-    # Remove travis ci badge
-    (r'.*travis-ci\.org/.*', ''),
-    # Remove pypip.in badges
-    (r'.*pypip\.in/.*', ''),
-    (r'.*crate\.io/.*', ''),
-    (r'.*coveralls\.io/.*', ''),
-)
-
-
 def rst(filename):
-    '''
-    Load rst file and sanitize it for PyPI.
-    Remove unsupported github tags:
-     - code-block directive
-     - travis ci build badge
-    '''
-    content = codecs.open(filename, encoding='utf-8').read()
-    for regex, replacement in PYPI_RST_FILTERS:
-        content = re.sub(regex, replacement, content)
-    return content
+    return codecs.open(filename, encoding='utf-8').read()
 
 
 long_description = '\n'.join((
@@ -37,10 +14,6 @@ long_description = '\n'.join((
     rst('CHANGELOG.rst'),
     ''
 ))
-
-install_requires = ['django']
-if sys.version_info[0:2] < (2, 7):
-    install_requires += ['argparse']
 
 setup(
     name='django.js',
@@ -53,9 +26,8 @@ setup(
     author_email='noirbizarre+django@gmail.com',
     packages=find_packages(),
     include_package_data=True,
-    install_requires=install_requires,
     license='LGPL',
-    use_2to3=True,
+    # use_2to3=True,
     keywords='django javascript test url reverse helpers',
     classifiers=[
         "Framework :: Django",
