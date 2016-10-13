@@ -4,40 +4,27 @@ This module provide helper views for javascript.
 '''
 from __future__ import unicode_literals
 
-import json
 import logging
-import re
 
-from django.http import HttpResponse
-from django.utils.cache import patch_vary_headers
+from django.http import JsonResponse
 from django.views.decorators.cache import cache_page
 from django.views.generic import View, TemplateView
 
 from djangojs.conf import settings
-from djangojs.urls_serializer import urls_as_dict, urls_as_json
-from djangojs.utils import StorageGlobber, LazyJsonEncoder, class_from_string
+from djangojs.urls_serializer import urls_as_dict
+from djangojs.utils import StorageGlobber, LazyJsonEncoder
 
 
 logger = logging.getLogger(__name__)
 
 
 __all__ = (
-    'JsInitView',
     'JsonView',
     'UrlsJsonView',
-    'ContextJsonView',
     'JsTestView',
     'JasmineView',
     'QUnitView',
 )
-
-RE_KWARG = re.compile(r"(\(\?P\<(.*?)\>.*?\))")  # Pattern for recongnizing named parameters in urls
-RE_ARG = re.compile(r"(\(.*?\))")  # Pattern for recognizing unnamed url parameters
-RE_OPT = re.compile(r"\w\?")  # Pattern for recognizing optionnal character
-RE_OPT_GRP = re.compile(r"\(\?\:.*\)\?")  # Pattern for recognizing optionnal group
-
-JSON_MIMETYPE = 'application/json'
-JAVASCRIPT_MIMETYPE = 'application/javascript'
 
 
 class CacheMixin(object):
@@ -47,41 +34,13 @@ class CacheMixin(object):
         return cache(super(CacheMixin, self).dispatch)(*args, **kwargs)
 
 
-class UserCacheMixin(CacheMixin):
-    def dispatch(self, *args, **kwargs):
-        response = super(UserCacheMixin, self).dispatch(*args, **kwargs)
-        patch_vary_headers(response, ('Cookie',))
-        return response
-
-
-class JsInitView(UserCacheMixin, TemplateView):
-    '''
-    Render a javascript file containing the URLs mapping and the context as JSON.
-    '''
-    template_name = 'djangojs/init.js'
-
-    def get_context_data(self, **kwargs):
-        context = super(JsInitView, self).get_context_data(**kwargs)
-        context['urls'] = urls_as_json()
-        serializer = class_from_string(settings.JS_CONTEXT_PROCESSOR)
-        context['context'] = serializer(self.request).as_json()
-        return context
-
-    def render_to_response(self, context, **response_kwargs):
-        response_kwargs['content_type'] = JAVASCRIPT_MIMETYPE
-        return super(JsInitView, self).render_to_response(context, **response_kwargs)
-
-
 class JsonView(View):
     '''
     A views that render JSON.
     '''
     def get(self, request, **kwargs):
         data = self.get_context_data(**kwargs)
-        return HttpResponse(
-            json.dumps(data, cls=LazyJsonEncoder),
-            content_type=JSON_MIMETYPE
-        )
+        return JsonResponse(data, LazyJsonEncoder)
 
 
 class UrlsJsonView(CacheMixin, JsonView):
@@ -90,15 +49,6 @@ class UrlsJsonView(CacheMixin, JsonView):
     '''
     def get_context_data(self, **kwargs):
         return urls_as_dict()
-
-
-class ContextJsonView(UserCacheMixin, JsonView):
-    '''
-    Render the context as a JSON object.
-    '''
-    def get_context_data(self, **kwargs):
-        serializer = class_from_string(settings.JS_CONTEXT_PROCESSOR)
-        return serializer(self.request).as_dict()
 
 
 class JsTestView(TemplateView):

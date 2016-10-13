@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import json
 import logging
 import re
 import sys
 import types
 
-from django.core.serializers.json import DjangoJSONEncoder
 from django.core.urlresolvers import RegexURLPattern, RegexURLResolver, get_script_prefix
 from django.utils import six
 
@@ -18,7 +16,6 @@ logger = logging.getLogger(__name__)
 
 __all__ = (
     'urls_as_dict',
-    'urls_as_json',
 )
 
 RE_KWARG = re.compile(r"(\(\?P\<(.*?)\>.*?\))")  # Pattern for recongnizing named parameters in urls
@@ -41,13 +38,6 @@ def urls_as_dict():
     '''
     module = settings.ROOT_URLCONF
     return _get_urls(module) if settings.JS_URLS_ENABLED else {}
-
-
-def urls_as_json():
-    '''
-    Get the URLs mapping as JSON
-    '''
-    return json.dumps(urls_as_dict(), cls=DjangoJSONEncoder)
 
 
 def _get_urls_for_pattern(pattern, prefix='', namespace=None):
