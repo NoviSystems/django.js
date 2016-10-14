@@ -11,7 +11,7 @@ from django.views.decorators.cache import cache_page
 from django.views.generic import View, TemplateView
 
 from djangojs.conf import settings
-from djangojs.urls_serializer import urls_as_dict
+from djangojs.urls_serializer import urls
 from djangojs.utils import StorageGlobber, LazyJsonEncoder
 
 
@@ -48,7 +48,7 @@ class UrlsJsonView(CacheMixin, JsonView):
     Render the URLs as a JSON object.
     '''
     def get_context_data(self, **kwargs):
-        return urls_as_dict()
+        return urls()
 
 
 class JsTestView(TemplateView):
