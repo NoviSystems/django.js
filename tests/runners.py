@@ -39,8 +39,8 @@ __all__ = (
 )
 
 LAUNCHERS = {
-    'jasmine': join(dirname(__file__), 'phantomjs', 'jasmine-runner.js'),
-    'qunit': join(dirname(__file__), 'phantomjs', 'qunit-runner.js')
+    'jasmine': join(dirname(__file__), 'js/phantomjs/jasmine-runner.js'),
+    'qunit': join(dirname(__file__), 'js/phantomjs/qunit-runner.js')
 }
 
 
@@ -102,11 +102,27 @@ class PhantomJsRunner(object):
         Execute a subprocess yielding output lines
         '''
         process = Popen(command, stdout=PIPE, stderr=STDOUT, universal_newlines=True)
-        while True:
-            if process.poll() is not None:
-                self.returncode = process.returncode  # pylint: disable=W0201
-                break
-            yield process.stdout.readline()
+
+        for line in iter(process.stdout.readline, ''):
+            print(line)
+
+        self.returncode = process.returncode
+
+        # out, err = process.communicate()
+        # process.wait()
+
+        # print('stdout:')
+        # print(str(out))
+
+        # print('stderr:')
+        # print(str(err))
+
+        # self.returncode = process.returncode
+        # while True:
+        #     if process.poll() is not None:
+        #         self.returncode = process.returncode  # pylint: disable=W0201
+        #         break
+        #     yield process.stdout.readline()
 
     def phantomjs(self, *args, **kwargs):
         '''
@@ -131,7 +147,9 @@ class PhantomJsRunner(object):
             sys.stdout.flush()
 
         with NamedTemporaryFile(delete=True) as cookies_file:
-            cmd = ('phantomjs', '--cookies-file=%s' % cookies_file.name) + args
+            cmd = ('node_modules/.bin/phantomjs', '--cookies-file=%s' % cookies_file.name) + args
+
+            print('cmd!!!!!', cmd)
             if self.timeout:
                 cmd += (str(self.timeout),)
             parser = TapParser(debug=VERBOSITY > 2)
@@ -163,6 +181,9 @@ class PhantomJsRunner(object):
             raise JsTestException('phantomjs_runner need to be defined')
 
         url = self.get_url()
+
+        response = self.client.get(url)
+        print(response.content.decode("utf-8"))
 
         self.phantomjs(self.phantomjs_runner, url, title=self.title)
         self.cleanup()

@@ -1,4 +1,5 @@
-{% load js %}
+{% load staticfiles %}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,7 +18,7 @@
     {% include "djangojs/qunit-runner-body.html" %}
 
     {% for file in js_test_files %}
-    {% js file %}
+    <script src="{% static file %}"></script>
     {% endfor %}
 
     {% block js_content %}{% endblock %}

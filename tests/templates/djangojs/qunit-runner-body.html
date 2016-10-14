@@ -1,7 +1,8 @@
-{% load js %}
+{% load staticfiles %}
+
 <div id="qunit"></div>
-{% js "js/test/libs/qunit.js" %}
-{% js "js/test/libs/qunit-tap.js" %}
+<script src="{% static 'test/libs/qunit.js' %}"></script>
+<script src="{% static 'test/libs/qunit-tap.js' %}"></script>
 <script type="text/javascript">
     if (navigator.userAgent.indexOf('PhantomJS') != -1) {
         var logger = function() { console.log.apply(console, arguments); };

@@ -25,7 +25,7 @@ class TestFormView(BaseFormView):
 
 class DjangoJsTestView(JasmineView):
     template_name = 'djangojs/test/djangojs-test-runner.html'
-    js_files = 'js/test/django.specs.js'
+    js_files = 'test/django.specs.js'
     django_js = True
 
     def get_context_data(self, **kwargs):
@@ -35,12 +35,12 @@ class DjangoJsTestView(JasmineView):
 
 
 class JasmineTestView(JasmineView):
-    js_files = 'js/test/jasmine/*Spec.js'
+    js_files = 'test/jasmine/*Spec.js'
 
 
 class QUnitTestView(QUnitView):
     template_name = 'djangojs/test/qunit-test-runner.html'
-    js_files = 'js/test/qunit/qunit-*.js'
+    js_files = 'test/qunit/qunit-*.js'
 
 
 fake_patterns = [
@@ -83,12 +83,11 @@ test_patterns = [
 ]
 
 urlpatterns = [
-    url(r'^$', DjangoJsTestView.as_view(), name='djangojs_tests'),
-
     url(r'^djangojs/', include('djangojs.urls', namespace='django-js')),
 
-    url(r'^jasmine/$', JasmineTestView.as_view(), name='djangojs_jasmine_tests'),
-    url(r'^qunit/$', QUnitTestView.as_view(), name='djangojs_qunit_tests'),
+    url(r'^tests/$', DjangoJsTestView.as_view(), name='tests'),
+    url(r'^jasmine/$', JasmineTestView.as_view(), name='jasmine_tests'),
+    url(r'^qunit/$', QUnitTestView.as_view(), name='qunit_tests'),
 
     url(r'^test/', include(test_patterns)),
 ]

@@ -12,6 +12,8 @@
 build/
 dist/
 
+node_modules/
+
 doc/_build
 
 .codeintel/

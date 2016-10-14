@@ -1,7 +1,4 @@
-{% load js %}
-{% css css_theme %}
-{% if use_django_js %}
-  {% django_js init=django_js_init %}
-{% elif use_jquery %}
-  {% jquery_js %}
-{% endif %}
+
+<link rel="stylesheet" type="text/css" href="{{ css_theme }}" />
+
+{% include "djangojs/django_js_init.html" %}
