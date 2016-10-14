@@ -2,10 +2,42 @@
 Django.js
 =========
 
-.. image:: https://secure.travis-ci.org/noirbizarre/django.js.png
-    :target: http://travis-ci.org/noirbizarre/django.js
+.. image:: https://secure.travis-ci.org/ITNG/django.js.png
+  :target: http://travis-ci.org/ITNG/django.js
 
 This is a simplified fork of Django.js that only supports client URLs.
+
+* All of the template and templatetag helpers have been removed.
+* The only endpoint is ``urls.json``
+* You must manually initialize the ``window.Django`` object with the urls endpoint.
+
+To use:
+
+.. code-block:: python
+
+    urlpatterns = [
+        ...
+        url(r'^djangojs/', include('djangojs.urls')),
+        ...
+    ]
+
+.. code-block:: html
+
+    <script src="{% static 'djangojs/django.js' %}"></script>
+    <script>
+        Django.initialize({urls: 'djangojs/urls.json'})
+    </script>
+
+Compatibility:
+==============
+
+Python: 2.7, 3.3, 3.4, 3.5
+Django: 1.8, 1.9, 1.10
+
+
+==================
+Original Contents:
+==================
 
 Django.js provides tools for JavaScript development with Django.
 
